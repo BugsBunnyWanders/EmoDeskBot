@@ -57,12 +57,14 @@ void drawHappyFace();
 void drawNeutralFace();
 void drawSadFace();
 void drawAngryFace();
+void drawGrinningFace();
 
 void drawClosedEye(int cx, int cy, int width);
 
 // "EVE-like" eye helpers
 void drawEveHappyEye(int cx, int cy, int r);
 void drawEveSadEye(int cx, int cy, int r);
+void drawEveGrinningEye(int cx, int cy, int r);
 
 /**
  * Draw an angry eye - angled downward toward the center with circular bottom
@@ -199,6 +201,7 @@ void handleRoot() {
   page += "<a href='/face?state=neutral'><button>Neutral</button></a> ";
   page += "<a href='/face?state=sad'><button>Sad</button></a> ";
   page += "<a href='/face?state=angry'><button>Angry</button></a> ";
+  page += "<a href='/face?state=grinning'><button>Grinning</button></a> ";
   page += "<br><br><form action='/face' method='get'>";
   page += "Custom Text: <input type='text' name='state' value='text:Hello!'>";
   page += "<input type='submit' value='Show'>";
@@ -231,6 +234,10 @@ void handleFaceRequest() {
   else if(s == "angry") {
     drawAngryFace();
     server.send(200, "text/plain", "Showing ANGRY face");
+  }
+  else if(s == "grinning") {
+    drawGrinningFace();
+    server.send(200, "text/plain", "Showing GRINNING face");
   }
   else if(s.startsWith("text:")) {
     String content = s.substring(5);
@@ -287,6 +294,7 @@ void updateFaceDisplay(){
   if(currentState == "happy")       drawHappyFace();
   else if(currentState == "sad")    drawSadFace();
   else if(currentState == "angry")  drawAngryFace();
+  else if(currentState == "grinning") drawGrinningFace();
   else                              drawNeutralFace();
 }
 
@@ -345,6 +353,19 @@ void drawEveSadEye(int cx, int cy, int r) {
   
   // Add a small teardrop beneath the eye for a more expressive sad face
   display.fillCircle(cx - 3, cyShifted + r + 3, 2, SSD1306_WHITE);
+}
+
+/**
+ * EVE GRINNING eye:
+ * Rectangular/square eyes with teeth below as shown in the image
+ */
+void drawEveGrinningEye(int cx, int cy, int r) {
+  // Draw a rectangular eye instead of curved (more like image)
+  int eyeWidth = r;
+  int eyeHeight = r;
+  
+  // Draw filled rectangle for each eye
+  display.fillRect(cx - eyeWidth/2, cy - eyeHeight/2, eyeWidth, eyeHeight, SSD1306_WHITE);
 }
 
 /*******************************************************
@@ -430,6 +451,40 @@ void drawAngryFace(){
     // Closed lines
     drawClosedEye(leftEyeX, eyeY, eyeWidth);
     drawClosedEye(rightEyeX, eyeY, eyeWidth);
+  }
+  display.display();
+}
+
+void drawGrinningFace(){
+  display.clearDisplay();
+
+  // Eye coordinates
+  int leftEyeX  = 42;
+  int rightEyeX = 86;
+  int eyeY      = SCREEN_HEIGHT / 2 - 5; // Move eyes up a bit to make room for teeth
+  int eyeRadius = 10;
+  
+  // Teeth parameters
+  int teethTop = SCREEN_HEIGHT / 2 + 10;
+  int teethWidth = 6;  // Width of each tooth
+  int teethHeight = 8; // Height of teeth
+  int numTeeth = 6;    // Number of teeth to draw
+  int teethStart = SCREEN_WIDTH/2 - (numTeeth * teethWidth)/2;
+
+  if(eyesOpen){
+    // Draw the rectangular eyes
+    drawEveGrinningEye(leftEyeX, eyeY, eyeRadius);
+    drawEveGrinningEye(rightEyeX, eyeY, eyeRadius);
+    
+    // Draw the teeth (a row of small rectangles)
+    for (int i = 0; i < numTeeth; i++) {
+      int toothX = teethStart + (i * teethWidth);
+      display.fillRect(toothX, teethTop, teethWidth-1, teethHeight, SSD1306_WHITE);
+    }
+  } else {
+    // Closed eye line
+    drawClosedEye(leftEyeX, eyeY, eyeRadius*2);
+    drawClosedEye(rightEyeX, eyeY, eyeRadius*2);
   }
   display.display();
 }
