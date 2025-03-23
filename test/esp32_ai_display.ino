@@ -482,9 +482,21 @@ void drawGrinningFace(){
       display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
     }
   } else {
-    // Closed eye line
-    drawClosedEye(leftEyeX, eyeY, eyeRadius*2);
-    drawClosedEye(rightEyeX, eyeY, eyeRadius*2);
+    // Draw closed eyes as shown in the image - two short curved/angled lines
+    int eyeWidth = 12;
+    int eyeHeight = 6;
+    
+    // Left eye - closed dash with slight angle
+    display.drawLine(leftEyeX - eyeWidth/2, eyeY - 1, leftEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
+    
+    // Right eye - closed dash with slight angle
+    display.drawLine(rightEyeX - eyeWidth/2, eyeY - 1, rightEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
+    
+    // Still draw teeth when eyes are closed
+    for (int i = 0; i < numTeeth; i++) {
+      int toothX = teethStart + (i * (teethWidth + teethGap));
+      display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
+    }
   }
   display.display();
 }
