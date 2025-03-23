@@ -471,32 +471,20 @@ void drawGrinningFace(){
   int teethStart = SCREEN_WIDTH/2 - (numTeeth * teethWidth)/2;
   int teethGap = 2;    // Small gap between teeth for better visual
 
-  if(eyesOpen){
-    // Draw the square eyes
-    drawEveGrinningEye(leftEyeX, eyeY, eyeRadius);
-    drawEveGrinningEye(rightEyeX, eyeY, eyeRadius);
-    
-    // Draw the teeth with small gaps between them (exactly as in image)
-    for (int i = 0; i < numTeeth; i++) {
-      int toothX = teethStart + (i * (teethWidth + teethGap));
-      display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
-    }
-  } else {
-    // Draw closed eyes as shown in the image - two short curved/angled lines
-    int eyeWidth = 12;
-    int eyeHeight = 6;
-    
-    // Left eye - closed dash with slight angle
-    display.drawLine(leftEyeX - eyeWidth/2, eyeY - 1, leftEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
-    
-    // Right eye - closed dash with slight angle
-    display.drawLine(rightEyeX - eyeWidth/2, eyeY - 1, rightEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
-    
-    // Still draw teeth when eyes are closed
-    for (int i = 0; i < numTeeth; i++) {
-      int toothX = teethStart + (i * (teethWidth + teethGap));
-      display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
-    }
+  // Always draw closed eyes for grinning face (no eyesOpen check)
+  int eyeWidth = 12;
+  
+  // Left eye - closed dash with slight angle
+  display.drawLine(leftEyeX - eyeWidth/2, eyeY - 1, leftEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
+  
+  // Right eye - closed dash with slight angle
+  display.drawLine(rightEyeX - eyeWidth/2, eyeY - 1, rightEyeX + eyeWidth/2, eyeY + 1, SSD1306_WHITE);
+  
+  // Draw teeth
+  for (int i = 0; i < numTeeth; i++) {
+    int toothX = teethStart + (i * (teethWidth + teethGap));
+    display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
   }
+  
   display.display();
 }
