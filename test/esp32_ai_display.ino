@@ -360,12 +360,11 @@ void drawEveSadEye(int cx, int cy, int r) {
  * Rectangular/square eyes with teeth below as shown in the image
  */
 void drawEveGrinningEye(int cx, int cy, int r) {
-  // Draw a rectangular eye instead of curved (more like image)
-  int eyeWidth = r;
-  int eyeHeight = r;
+  // Draw a perfect square eye (exactly matching the image)
+  int eyeSize = 12; // Perfect square eye
   
-  // Draw filled rectangle for each eye
-  display.fillRect(cx - eyeWidth/2, cy - eyeHeight/2, eyeWidth, eyeHeight, SSD1306_WHITE);
+  // Draw filled square for each eye
+  display.fillRect(cx - eyeSize/2, cy - eyeSize/2, eyeSize, eyeSize, SSD1306_WHITE);
 }
 
 /*******************************************************
@@ -461,25 +460,26 @@ void drawGrinningFace(){
   // Eye coordinates
   int leftEyeX  = 42;
   int rightEyeX = 86;
-  int eyeY      = SCREEN_HEIGHT / 2 - 5; // Move eyes up a bit to make room for teeth
+  int eyeY      = SCREEN_HEIGHT / 2 - 8; // Move eyes higher to match image exactly
   int eyeRadius = 10;
   
-  // Teeth parameters
-  int teethTop = SCREEN_HEIGHT / 2 + 10;
-  int teethWidth = 6;  // Width of each tooth
+  // Teeth parameters - adjusted to match image exactly
+  int teethTop = SCREEN_HEIGHT / 2 + 8;
+  int teethWidth = 8;  // Wider teeth to match image
   int teethHeight = 8; // Height of teeth
-  int numTeeth = 6;    // Number of teeth to draw
+  int numTeeth = 5;    // Exactly 5 teeth as shown in image
   int teethStart = SCREEN_WIDTH/2 - (numTeeth * teethWidth)/2;
+  int teethGap = 2;    // Small gap between teeth for better visual
 
   if(eyesOpen){
-    // Draw the rectangular eyes
+    // Draw the square eyes
     drawEveGrinningEye(leftEyeX, eyeY, eyeRadius);
     drawEveGrinningEye(rightEyeX, eyeY, eyeRadius);
     
-    // Draw the teeth (a row of small rectangles)
+    // Draw the teeth with small gaps between them (exactly as in image)
     for (int i = 0; i < numTeeth; i++) {
-      int toothX = teethStart + (i * teethWidth);
-      display.fillRect(toothX, teethTop, teethWidth-1, teethHeight, SSD1306_WHITE);
+      int toothX = teethStart + (i * (teethWidth + teethGap));
+      display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
     }
   } else {
     // Closed eye line
