@@ -58,6 +58,7 @@ void drawNeutralFace();
 void drawSadFace();
 void drawAngryFace();
 void drawGrinningFace();
+void drawScaredFace();
 
 void drawClosedEye(int cx, int cy, int width);
 
@@ -65,6 +66,7 @@ void drawClosedEye(int cx, int cy, int width);
 void drawEveHappyEye(int cx, int cy, int r);
 void drawEveSadEye(int cx, int cy, int r);
 void drawEveGrinningEye(int cx, int cy, int r);
+void drawEveScaredEye(int cx, int cy, int r);
 
 /**
  * Draw an angry eye - angled downward toward the center with circular bottom
@@ -202,6 +204,7 @@ void handleRoot() {
   page += "<a href='/face?state=sad'><button>Sad</button></a> ";
   page += "<a href='/face?state=angry'><button>Angry</button></a> ";
   page += "<a href='/face?state=grinning'><button>Grinning</button></a> ";
+  page += "<a href='/face?state=scared'><button>Scared</button></a> ";
   page += "<br><br><form action='/face' method='get'>";
   page += "Custom Text: <input type='text' name='state' value='text:Hello!'>";
   page += "<input type='submit' value='Show'>";
@@ -238,6 +241,10 @@ void handleFaceRequest() {
   else if(s == "grinning") {
     drawGrinningFace();
     server.send(200, "text/plain", "Showing GRINNING face");
+  }
+  else if(s == "scared") {
+    drawScaredFace();
+    server.send(200, "text/plain", "Showing SCARED face");
   }
   else if(s.startsWith("text:")) {
     String content = s.substring(5);
@@ -295,6 +302,7 @@ void updateFaceDisplay(){
   else if(currentState == "sad")    drawSadFace();
   else if(currentState == "angry")  drawAngryFace();
   else if(currentState == "grinning") drawGrinningFace();
+  else if(currentState == "scared") drawScaredFace();
   else                              drawNeutralFace();
 }
 
@@ -365,6 +373,21 @@ void drawEveGrinningEye(int cx, int cy, int r) {
   
   // Draw filled square for each eye
   display.fillRect(cx - eyeSize/2, cy - eyeSize/2, eyeSize, eyeSize, SSD1306_WHITE);
+}
+
+/**
+ * EVE SCARED eye:
+ *  Large circular eyes to represent fear/surprise
+ */
+void drawEveScaredEye(int cx, int cy, int r) {
+  // Draw a larger circle than neutral for surprised/scared look
+  int scaredRadius = r + 2; // Make eyes slightly larger for scared effect
+  
+  // Draw filled circle for each eye
+  display.fillCircle(cx, cy, scaredRadius, SSD1306_WHITE);
+  
+  // Add small highlight (empty circle inside) to enhance scared look
+  display.fillCircle(cx, cy, scaredRadius - 4, SSD1306_BLACK);
 }
 
 /*******************************************************
@@ -484,6 +507,50 @@ void drawGrinningFace(){
   for (int i = 0; i < numTeeth; i++) {
     int toothX = teethStart + (i * (teethWidth + teethGap));
     display.fillRect(toothX, teethTop, teethWidth, teethHeight, SSD1306_WHITE);
+  }
+  
+  display.display();
+}
+
+void drawScaredFace(){
+  display.clearDisplay();
+
+  // Eye coordinates similar to the other faces
+  int leftEyeX  = 42;
+  int rightEyeX = 86; 
+  int eyeY      = SCREEN_HEIGHT / 2 - 2; // Slightly higher on screen
+  int eyeRadius = 10;
+
+  if(eyesOpen){
+    // Draw the scared eyes
+    drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
+    drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
+    
+    // Add small vertical line below eyes to enhance scared expression
+    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 10, 
+                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 18, SSD1306_WHITE);
+  } else {
+    // When eyes are closed, show trembling lines
+    int lineWidth = eyeRadius * 2;
+    // Wavy/trembling line for left eye
+    display.drawLine(leftEyeX - lineWidth/2, eyeY - 1, 
+                     leftEyeX - lineWidth/4, eyeY + 1, SSD1306_WHITE);
+    display.drawLine(leftEyeX - lineWidth/4, eyeY + 1, 
+                     leftEyeX + lineWidth/4, eyeY - 1, SSD1306_WHITE);
+    display.drawLine(leftEyeX + lineWidth/4, eyeY - 1, 
+                     leftEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
+    
+    // Wavy/trembling line for right eye
+    display.drawLine(rightEyeX - lineWidth/2, eyeY - 1, 
+                     rightEyeX - lineWidth/4, eyeY + 1, SSD1306_WHITE);
+    display.drawLine(rightEyeX - lineWidth/4, eyeY + 1, 
+                     rightEyeX + lineWidth/4, eyeY - 1, SSD1306_WHITE);
+    display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
+                     rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
+                     
+    // Still show the vertical line below
+    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 10, 
+                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 18, SSD1306_WHITE);
   }
   
   display.display();

@@ -35,7 +35,7 @@ activation_phrases = ["hey bot", "hey desk bot", "emo", "emodesk", "hi bot", "he
 # Initialize conversation history
 conversation_history = [
     {"role": "system", "content": """You are Emo, an AI powered cute Desk bot that controls a small OLED display on an ESP32 device.
-You can show different faces (happy, neutral, sad, angry, grinning) and display simple information.
+You can show different faces (happy, neutral, sad, angry, grinning, scared) and display simple information.
 When asked about time, weather, or other data that would be helpful to display, you should both
 answer conversationally AND tell the system to display relevant information on the OLED.
      Also your responses should be short, as cute as possible and funny. Behave like a 10 year old baby.
@@ -47,6 +47,7 @@ Example responses:
 4. If someone shares bad news: "I'm sorry to hear that. [DISPLAY:sad]"
 5. If someone says something funny: "Hehe, that's hilarious! [DISPLAY:grinning]"
 6. If someone asks about weather: "It's sunny and 72°F today. [DISPLAY:weather]"
+7. If someone startles you or mentions something scary: "Eek! That's frightening! [DISPLAY:scared]"
 
 Try to be helpful, friendly, and use the display capabilities when relevant.
 """}
@@ -279,6 +280,8 @@ def process_display_commands(response):
                 send_to_esp32("angry")
             elif command == "grinning":
                 send_to_esp32("grinning")
+            elif command == "scared":
+                send_to_esp32("scared")
             elif command == "time":
                 current_time = get_time()
                 send_to_esp32(f"text:Time: {current_time}")
@@ -562,6 +565,8 @@ def chat_with_ai_stream(user_input):
                                             send_to_esp32("angry")
                                         elif display_cmd == "grinning":
                                             send_to_esp32("grinning")
+                                        elif display_cmd == "scared":
+                                            send_to_esp32("scared")
                                         elif display_cmd == "time":
                                             current_time = get_time()
                                             send_to_esp32(f"text:Time: {current_time}")
