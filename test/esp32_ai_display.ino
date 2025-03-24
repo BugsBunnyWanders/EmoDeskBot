@@ -529,8 +529,8 @@ void drawScaredFace(){
     // Draw a small open mouth/circle to show a scared expression
     // Should be a small O not just a dot
     int mouthX = SCREEN_WIDTH/2;
-    int mouthY = SCREEN_HEIGHT/2 + 8;
-    int mouthSize = 3; // Small circular mouth
+    int mouthY = SCREEN_HEIGHT/2 + 12; // Move mouth lower (was +8)
+    int mouthSize = 4; // Wider circular mouth (was 3)
     
     // Draw a small filled circle for the open mouth
     display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
@@ -555,8 +555,8 @@ void drawScaredFace(){
                      
     // Also draw the small open mouth when eyes are closed
     int mouthX = SCREEN_WIDTH/2;
-    int mouthY = SCREEN_HEIGHT/2 + 8;
-    int mouthSize = 3; // Small circular mouth
+    int mouthY = SCREEN_HEIGHT/2 + 12; // Move mouth lower (was +8)
+    int mouthSize = 4; // Wider circular mouth (was 3)
     
     // Draw a small filled circle for the open mouth
     display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
