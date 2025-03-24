@@ -526,15 +526,15 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Draw the mouth exactly as it appears in the reference image - 
-    // a small downward curved arc (smile) centered below the eyes
-    int mouthWidth = 16;  // Width of the mouth arc
-    int mouthY = SCREEN_HEIGHT / 2 + 10;  // Vertical position
-    int mouthCurve = 4;  // How much the arc curves downward
+    // Draw a small dot for the mouth to match the image exactly
+    // The image shows a tiny dot rather than a curved arc
+    int mouthX = SCREEN_WIDTH/2;
+    int mouthY = SCREEN_HEIGHT/2 + 8;
     
-    // Draw a smooth curved arc for the mouth (smile shape)
-    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 1, SSD1306_WHITE); // Left part
-    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 2, SSD1306_WHITE); // Right part
+    // Draw a small dot for the mouth (1-2 pixels)
+    display.drawPixel(mouthX, mouthY, SSD1306_WHITE);
+    // Make it slightly more visible with an extra pixel
+    display.drawPixel(mouthX, mouthY+1, SSD1306_WHITE);
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -555,13 +555,13 @@ void drawScaredFace(){
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
     // Also draw the mouth when eyes are closed
-    int mouthWidth = 16;  // Width of the mouth arc
-    int mouthY = SCREEN_HEIGHT / 2 + 10;  // Vertical position
-    int mouthCurve = 4;  // How much the arc curves downward
+    int mouthX = SCREEN_WIDTH/2;
+    int mouthY = SCREEN_HEIGHT/2 + 8;
     
-    // Draw a smooth curved arc for the mouth (smile shape)
-    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 1, SSD1306_WHITE); // Left part
-    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 2, SSD1306_WHITE); // Right part
+    // Draw a small dot for the mouth (1-2 pixels)
+    display.drawPixel(mouthX, mouthY, SSD1306_WHITE);
+    // Make it slightly more visible with an extra pixel
+    display.drawPixel(mouthX, mouthY+1, SSD1306_WHITE);
   }
   
   display.display();
