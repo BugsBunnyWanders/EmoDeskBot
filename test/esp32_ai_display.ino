@@ -526,15 +526,14 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Draw a small dot for the mouth to match the image exactly
-    // The image shows a tiny dot rather than a curved arc
+    // Draw a small open mouth/circle to show a scared expression
+    // Should be a small O not just a dot
     int mouthX = SCREEN_WIDTH/2;
     int mouthY = SCREEN_HEIGHT/2 + 8;
+    int mouthSize = 3; // Small circular mouth
     
-    // Draw a small dot for the mouth (1-2 pixels)
-    display.drawPixel(mouthX, mouthY, SSD1306_WHITE);
-    // Make it slightly more visible with an extra pixel
-    display.drawPixel(mouthX, mouthY+1, SSD1306_WHITE);
+    // Draw a small filled circle for the open mouth
+    display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -554,14 +553,13 @@ void drawScaredFace(){
     display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
-    // Also draw the mouth when eyes are closed
+    // Also draw the small open mouth when eyes are closed
     int mouthX = SCREEN_WIDTH/2;
     int mouthY = SCREEN_HEIGHT/2 + 8;
+    int mouthSize = 3; // Small circular mouth
     
-    // Draw a small dot for the mouth (1-2 pixels)
-    display.drawPixel(mouthX, mouthY, SSD1306_WHITE);
-    // Make it slightly more visible with an extra pixel
-    display.drawPixel(mouthX, mouthY+1, SSD1306_WHITE);
+    // Draw a small filled circle for the open mouth
+    display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
   }
   
   display.display();
