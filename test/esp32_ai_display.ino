@@ -526,10 +526,16 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Add small vertical line for mouth - adjusted to match the image exactly
-    // Make it a short, thin line for the scared expression
-    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 12, 
-                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 16, SSD1306_WHITE);
+    // Draw a curved mouth similar to the reference image
+    // This is a small arc/curve in the center below the eyes
+    int mouthWidth = 10;
+    int mouthY = SCREEN_HEIGHT / 2 + 14;
+    
+    // Draw a curved line for the mouth (slightly curved upward)
+    display.drawLine(SCREEN_WIDTH/2 - mouthWidth/2, mouthY, 
+                     SCREEN_WIDTH/2, mouthY - 2, SSD1306_WHITE);
+    display.drawLine(SCREEN_WIDTH/2, mouthY - 2,
+                     SCREEN_WIDTH/2 + mouthWidth/2, mouthY, SSD1306_WHITE);
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -549,9 +555,15 @@ void drawScaredFace(){
     display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
-    // Still show the vertical line for mouth
-    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 12, 
-                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 16, SSD1306_WHITE);
+    // Also draw the curved mouth when eyes are closed
+    int mouthWidth = 10;
+    int mouthY = SCREEN_HEIGHT / 2 + 14;
+    
+    // Draw a curved line for the mouth (slightly curved upward)
+    display.drawLine(SCREEN_WIDTH/2 - mouthWidth/2, mouthY, 
+                     SCREEN_WIDTH/2, mouthY - 2, SSD1306_WHITE);
+    display.drawLine(SCREEN_WIDTH/2, mouthY - 2,
+                     SCREEN_WIDTH/2 + mouthWidth/2, mouthY, SSD1306_WHITE);
   }
   
   display.display();
