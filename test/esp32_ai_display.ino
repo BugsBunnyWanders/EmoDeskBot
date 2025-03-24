@@ -526,9 +526,10 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Add small vertical line below eyes to enhance scared expression
-    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 10, 
-                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 18, SSD1306_WHITE);
+    // Add small vertical line for mouth - adjusted to match the image exactly
+    // Make it a short, thin line for the scared expression
+    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 12, 
+                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 16, SSD1306_WHITE);
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -548,9 +549,9 @@ void drawScaredFace(){
     display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
-    // Still show the vertical line below
-    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 10, 
-                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 18, SSD1306_WHITE);
+    // Still show the vertical line for mouth
+    display.drawLine(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 12, 
+                     SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 16, SSD1306_WHITE);
   }
   
   display.display();
