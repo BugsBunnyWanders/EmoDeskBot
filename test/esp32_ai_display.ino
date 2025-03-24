@@ -526,16 +526,15 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Draw a curved mouth similar to the reference image
-    // This is a small arc/curve in the center below the eyes
-    int mouthWidth = 10;
-    int mouthY = SCREEN_HEIGHT / 2 + 14;
+    // Draw the mouth exactly as it appears in the reference image - 
+    // a small downward curved arc (smile) centered below the eyes
+    int mouthWidth = 16;  // Width of the mouth arc
+    int mouthY = SCREEN_HEIGHT / 2 + 10;  // Vertical position
+    int mouthCurve = 4;  // How much the arc curves downward
     
-    // Draw a curved line for the mouth (slightly curved upward)
-    display.drawLine(SCREEN_WIDTH/2 - mouthWidth/2, mouthY, 
-                     SCREEN_WIDTH/2, mouthY - 2, SSD1306_WHITE);
-    display.drawLine(SCREEN_WIDTH/2, mouthY - 2,
-                     SCREEN_WIDTH/2 + mouthWidth/2, mouthY, SSD1306_WHITE);
+    // Draw a smooth curved arc for the mouth (smile shape)
+    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 1, SSD1306_WHITE); // Left part
+    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 2, SSD1306_WHITE); // Right part
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -555,15 +554,14 @@ void drawScaredFace(){
     display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
-    // Also draw the curved mouth when eyes are closed
-    int mouthWidth = 10;
-    int mouthY = SCREEN_HEIGHT / 2 + 14;
+    // Also draw the mouth when eyes are closed
+    int mouthWidth = 16;  // Width of the mouth arc
+    int mouthY = SCREEN_HEIGHT / 2 + 10;  // Vertical position
+    int mouthCurve = 4;  // How much the arc curves downward
     
-    // Draw a curved line for the mouth (slightly curved upward)
-    display.drawLine(SCREEN_WIDTH/2 - mouthWidth/2, mouthY, 
-                     SCREEN_WIDTH/2, mouthY - 2, SSD1306_WHITE);
-    display.drawLine(SCREEN_WIDTH/2, mouthY - 2,
-                     SCREEN_WIDTH/2 + mouthWidth/2, mouthY, SSD1306_WHITE);
+    // Draw a smooth curved arc for the mouth (smile shape)
+    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 1, SSD1306_WHITE); // Left part
+    display.drawCircleHelper(SCREEN_WIDTH/2, mouthY - mouthCurve, mouthCurve, 2, SSD1306_WHITE); // Right part
   }
   
   display.display();
