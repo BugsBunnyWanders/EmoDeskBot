@@ -526,14 +526,34 @@ void drawScaredFace(){
     drawEveScaredEye(leftEyeX, eyeY, eyeRadius);
     drawEveScaredEye(rightEyeX, eyeY, eyeRadius);
     
-    // Draw a small open mouth/circle to show a scared expression
-    // Should be a small O not just a dot
-    int mouthX = SCREEN_WIDTH/2;
-    int mouthY = SCREEN_HEIGHT/2 + 12; // Move mouth lower (was +8)
-    int mouthSize = 4; // Wider circular mouth (was 3)
+    // Draw a curved open mouth that matches the image (inward curves at top and bottom)
+    int mouthCenterX = SCREEN_WIDTH/2;
+    int mouthCenterY = SCREEN_HEIGHT/2 + 14; // Lower position for the mouth
+    int mouthWidth = 20;  // Width of the mouth
+    int mouthHeight = 10; // Height of the mouth
     
-    // Draw a small filled circle for the open mouth
-    display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
+    // Draw the curved mouth shape
+    // Top curved line (curved inward at the middle)
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY - mouthHeight/2, // Left top
+                     mouthCenterX - mouthWidth/4, mouthCenterY - mouthHeight/2 + 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX - mouthWidth/4, mouthCenterY - mouthHeight/2 + 2,
+                     mouthCenterX + mouthWidth/4, mouthCenterY - mouthHeight/2 + 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/4, mouthCenterY - mouthHeight/2 + 2,
+                     mouthCenterX + mouthWidth/2, mouthCenterY - mouthHeight/2, SSD1306_WHITE);
+                     
+    // Bottom curved line (curved inward at the middle)
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY + mouthHeight/2, // Left bottom
+                     mouthCenterX - mouthWidth/4, mouthCenterY + mouthHeight/2 - 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX - mouthWidth/4, mouthCenterY + mouthHeight/2 - 2,
+                     mouthCenterX + mouthWidth/4, mouthCenterY + mouthHeight/2 - 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/4, mouthCenterY + mouthHeight/2 - 2,
+                     mouthCenterX + mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
+                     
+    // Vertical sides to connect the top and bottom curves
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY - mouthHeight/2, // Left side
+                     mouthCenterX - mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/2, mouthCenterY - mouthHeight/2, // Right side
+                     mouthCenterX + mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
   } else {
     // When eyes are closed, show trembling lines
     int lineWidth = eyeRadius * 2;
@@ -553,13 +573,34 @@ void drawScaredFace(){
     display.drawLine(rightEyeX + lineWidth/4, eyeY - 1, 
                      rightEyeX + lineWidth/2, eyeY + 1, SSD1306_WHITE);
                      
-    // Also draw the small open mouth when eyes are closed
-    int mouthX = SCREEN_WIDTH/2;
-    int mouthY = SCREEN_HEIGHT/2 + 12; // Move mouth lower (was +8)
-    int mouthSize = 4; // Wider circular mouth (was 3)
+    // Also draw the curved mouth when eyes are closed
+    int mouthCenterX = SCREEN_WIDTH/2;
+    int mouthCenterY = SCREEN_HEIGHT/2 + 14; // Lower position for the mouth
+    int mouthWidth = 20;  // Width of the mouth
+    int mouthHeight = 10; // Height of the mouth
     
-    // Draw a small filled circle for the open mouth
-    display.fillCircle(mouthX, mouthY, mouthSize, SSD1306_WHITE);
+    // Draw the curved mouth shape
+    // Top curved line (curved inward at the middle)
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY - mouthHeight/2, // Left top
+                     mouthCenterX - mouthWidth/4, mouthCenterY - mouthHeight/2 + 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX - mouthWidth/4, mouthCenterY - mouthHeight/2 + 2,
+                     mouthCenterX + mouthWidth/4, mouthCenterY - mouthHeight/2 + 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/4, mouthCenterY - mouthHeight/2 + 2,
+                     mouthCenterX + mouthWidth/2, mouthCenterY - mouthHeight/2, SSD1306_WHITE);
+                     
+    // Bottom curved line (curved inward at the middle)
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY + mouthHeight/2, // Left bottom
+                     mouthCenterX - mouthWidth/4, mouthCenterY + mouthHeight/2 - 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX - mouthWidth/4, mouthCenterY + mouthHeight/2 - 2,
+                     mouthCenterX + mouthWidth/4, mouthCenterY + mouthHeight/2 - 2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/4, mouthCenterY + mouthHeight/2 - 2,
+                     mouthCenterX + mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
+                     
+    // Vertical sides to connect the top and bottom curves
+    display.drawLine(mouthCenterX - mouthWidth/2, mouthCenterY - mouthHeight/2, // Left side
+                     mouthCenterX - mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
+    display.drawLine(mouthCenterX + mouthWidth/2, mouthCenterY - mouthHeight/2, // Right side
+                     mouthCenterX + mouthWidth/2, mouthCenterY + mouthHeight/2, SSD1306_WHITE);
   }
   
   display.display();
