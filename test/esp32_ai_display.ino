@@ -16,6 +16,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <ESP32Servo.h> // Add Servo library for ESP32
 
 // ----- WiFi Credentials -----
 const char* ssid     = "RAY";
@@ -27,7 +28,15 @@ const char* password = "success@2020";
 #define OLED_RESET    -1
 #define OLED_ADDR     0x3C
 
+// ----- Servo Settings -----
+#define SERVO_PIN      13    // GPIO pin for servo control
+#define SERVO_MIN_POS  0     // Minimum angle (left position)
+#define SERVO_CENTER   90    // Center position
+#define SERVO_MAX_POS  180   // Maximum angle (right position)
+#define SERVO_MOVE_DELAY 15  // Delay between each degree of movement for smooth motion
+
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+Servo headServo;              // Servo object for head movement
 
 // ----- Web Server -----
 WebServer server(80);
@@ -36,6 +45,7 @@ WebServer server(80);
 String currentState = "neutral";
 bool   eyesOpen     = true;
 bool   displayingText = false;
+int    currentHeadPosition = SERVO_CENTER; // Track current head position
 
 // Blinking intervals
 unsigned long lastBlinkTime  = 0;
@@ -49,9 +59,15 @@ const int textDisplayDuration = 10000; // 10 seconds
 // Forward declarations
 void handleRoot();
 void handleFaceRequest();
+void handleHeadRequest();
 void handleNotFound();
 void displayText(const String &txt);
 void updateFaceDisplay();
+void moveHeadTo(int position);
+void moveHeadLeft();
+void moveHeadRight();
+void moveHeadCenter();
+void moveHeadLeftRight(); // Head shake animation
 
 void drawHappyFace();
 void drawNeutralFace();
@@ -132,6 +148,13 @@ void setup() {
   display.clearDisplay();
   display.display();
   Serial.println("OLED init OK.");
+  
+  // Initialize servo
+  ESP32PWM::allocateTimer(0);
+  headServo.setPeriodHertz(50);    // Standard 50hz servo
+  headServo.attach(SERVO_PIN, 500, 2400); // Attach to pin with min/max microsecond range
+  moveHeadCenter(); // Center the head at startup
+  Serial.println("Servo init OK.");
 
   // Connect WiFi
   Serial.print("Connecting to ");
@@ -157,6 +180,7 @@ void setup() {
   // Start server
   server.on("/", handleRoot);
   server.on("/face", handleFaceRequest);
+  server.on("/head", handleHeadRequest); // Add endpoint for head control
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("HTTP server started.");
@@ -205,6 +229,11 @@ void handleRoot() {
   page += "<a href='/face?state=angry'><button>Angry</button></a> ";
   page += "<a href='/face?state=grinning'><button>Grinning</button></a> ";
   page += "<a href='/face?state=scared'><button>Scared</button></a> ";
+  page += "<br><br>";
+  page += "<a href='/head?pos=left'><button>Head Left</button></a> ";
+  page += "<a href='/head?pos=center'><button>Head Center</button></a> ";
+  page += "<a href='/head?pos=right'><button>Head Right</button></a> ";
+  page += "<a href='/head?pos=shake'><button>Head Shake</button></a> ";
   page += "<br><br><form action='/face' method='get'>";
   page += "Custom Text: <input type='text' name='state' value='text:Hello!'>";
   page += "<input type='submit' value='Show'>";
@@ -253,6 +282,47 @@ void handleFaceRequest() {
   }
   else {
     server.send(400, "text/plain", "Invalid state");
+  }
+}
+
+void handleHeadRequest() {
+  if(!server.hasArg("pos")) {
+    server.send(400, "text/plain", "Missing position parameter");
+    return;
+  }
+
+  String pos = server.arg("pos");
+  Serial.println("Head position: " + pos);
+
+  if(pos == "left") {
+    moveHeadLeft();
+    server.send(200, "text/plain", "Head moved left");
+  }
+  else if(pos == "right") {
+    moveHeadRight();
+    server.send(200, "text/plain", "Head moved right");
+  }
+  else if(pos == "center") {
+    moveHeadCenter();
+    server.send(200, "text/plain", "Head centered");
+  }
+  else if(pos == "shake") {
+    moveHeadLeftRight();
+    server.send(200, "text/plain", "Head shaking");
+  }
+  else if(pos.startsWith("angle:")) {
+    // Handle specific angle if needed
+    String angleStr = pos.substring(6);
+    int angle = angleStr.toInt();
+    if(angle >= SERVO_MIN_POS && angle <= SERVO_MAX_POS) {
+      moveHeadTo(angle);
+      server.send(200, "text/plain", "Head moved to " + angleStr + " degrees");
+    } else {
+      server.send(400, "text/plain", "Invalid angle");
+    }
+  }
+  else {
+    server.send(400, "text/plain", "Invalid position");
   }
 }
 
@@ -604,4 +674,66 @@ void drawScaredFace(){
   }
   
   display.display();
+}
+
+/*******************************************************
+ * Servo Control Functions
+ *******************************************************/
+
+// Move head to specific position smoothly
+void moveHeadTo(int position) {
+  // Constrain position to valid range
+  position = constrain(position, SERVO_MIN_POS, SERVO_MAX_POS);
+  
+  // Move smoothly - step by step
+  if(position > currentHeadPosition) {
+    // Moving right
+    for(int pos = currentHeadPosition; pos <= position; pos++) {
+      headServo.write(pos);
+      delay(SERVO_MOVE_DELAY);
+    }
+  } else if(position < currentHeadPosition) {
+    // Moving left
+    for(int pos = currentHeadPosition; pos >= position; pos--) {
+      headServo.write(pos);
+      delay(SERVO_MOVE_DELAY);
+    }
+  }
+  
+  // Update current position
+  currentHeadPosition = position;
+}
+
+// Move head to left position
+void moveHeadLeft() {
+  moveHeadTo(SERVO_MIN_POS);
+}
+
+// Move head to center position
+void moveHeadCenter() {
+  moveHeadTo(SERVO_CENTER);
+}
+
+// Move head to right position
+void moveHeadRight() {
+  moveHeadTo(SERVO_MAX_POS);
+}
+
+// Head shake animation (left-right-center)
+void moveHeadLeftRight() {
+  // Quick movements for shaking
+  headServo.write(SERVO_MIN_POS + 20);
+  delay(200);
+  headServo.write(SERVO_MAX_POS - 20);
+  delay(200);
+  headServo.write(SERVO_MIN_POS + 20);
+  delay(200);
+  headServo.write(SERVO_MAX_POS - 20);
+  delay(200);
+  
+  // Return to center
+  moveHeadCenter();
+  
+  // Update position tracking
+  currentHeadPosition = SERVO_CENTER;
 }

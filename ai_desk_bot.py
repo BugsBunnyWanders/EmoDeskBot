@@ -36,20 +36,24 @@ activation_phrases = ["hey bot", "hey desk bot", "emo", "emodesk", "hi bot", "he
 conversation_history = [
     {"role": "system", "content": """You are Emo, an AI powered cute Desk bot that controls a small OLED display on an ESP32 device.
 You can show different faces (happy, neutral, sad, angry, grinning, scared) and display simple information.
+You can also move your head left, right, center, or shake it to express emotions.
 When asked about time, weather, or other data that would be helpful to display, you should both
 answer conversationally AND tell the system to display relevant information on the OLED.
      Also your responses should be short, as cute as possible and funny. Behave like a 10 year old baby.
 
 Example responses:
-1. If someone asks if you're happy: "I'm feeling great today! [DISPLAY:happy]"
-2. If someone asks for the time: "It's currently 3:45 PM. [DISPLAY:time]"
-3. If someone asks if you're upset: "Grrrr, I'm a bit mad right now! [DISPLAY:angry]"
-4. If someone shares bad news: "I'm sorry to hear that. [DISPLAY:sad]"
-5. If someone says something funny: "Hehe, that's hilarious! [DISPLAY:grinning]"
-6. If someone asks about weather: "It's sunny and 72°F today. [DISPLAY:weather]"
-7. If someone startles you or mentions something scary: "Eek! That's frightening! [DISPLAY:scared]"
+1. If someone asks if you're happy: "I'm feeling great today! [DISPLAY:happy] [HEAD:center]"
+2. If someone asks for the time: "It's currently 3:45 PM. [DISPLAY:time] [HEAD:center]"
+3. If someone asks if you're upset: "Grrrr, I'm a bit mad right now! [DISPLAY:angry] [HEAD:shake]"
+4. If someone shares bad news: "I'm sorry to hear that. [DISPLAY:sad] [HEAD:right]"
+5. If someone says something funny: "Hehe, that's hilarious! [DISPLAY:grinning] [HEAD:shake]"
+6. If someone asks about weather: "It's sunny and 72°F today. [DISPLAY:weather] [HEAD:center]"
+7. If someone startles you or mentions something scary: "Eek! That's frightening! [DISPLAY:scared] [HEAD:shake]"
+8. If someone asks you to look left: "Looking to the left! [DISPLAY:neutral] [HEAD:left]"
+9. If someone asks you to look right: "Looking to the right! [DISPLAY:neutral] [HEAD:right]"
+10. If someone says hi or greets you: "Hello there! Nice to see you! [DISPLAY:happy] [HEAD:shake]"
 
-Try to be helpful, friendly, and use the display capabilities when relevant.
+Try to be helpful, friendly, and use the display capabilities and head movements when relevant.
 """}
 ]
 
@@ -262,6 +266,8 @@ def get_time():
 def process_display_commands(response):
     """Process any display commands in the response"""
     original_response = response
+    
+    # Process DISPLAY commands
     if "[DISPLAY:" in response:
         # Extract display command
         start_idx = response.find("[DISPLAY:")
@@ -299,7 +305,44 @@ def process_display_commands(response):
             # Remove the command from the response for clean output to user
             response = response[:start_idx] + response[end_idx + 1:]
     
+    # Process HEAD commands
+    if "[HEAD:" in response:
+        # Extract head command
+        start_idx = response.find("[HEAD:")
+        end_idx = response.find("]", start_idx)
+        if end_idx > start_idx:
+            command = response[start_idx + 6:end_idx].lower()
+            
+            # Handle different head movement commands
+            if command == "left":
+                send_head_command("left")
+            elif command == "right":
+                send_head_command("right")
+            elif command == "center":
+                send_head_command("center")
+            elif command == "shake":
+                send_head_command("shake")
+            elif command.startswith("angle:"):
+                # Handle specific angle
+                send_head_command(command)
+            else:
+                print(f"Unknown head command: {command}")
+            
+            # Remove the command from the response for clean output to user
+            response = response[:start_idx] + response[end_idx + 1:]
+    
     return response
+
+def send_head_command(position):
+    """Send a head movement command to the ESP32"""
+    try:
+        url = f"http://{ESP32_IP}:{ESP32_PORT}/head?pos={position}"
+        response = requests.get(url, timeout=2)
+        print(f"Sent head position '{position}' to ESP32. Response: {response.status_code}")
+        return True
+    except Exception as e:
+        print(f"Failed to send head position to ESP32: {e}")
+        return False
 
 def listen_for_speech(timeout=5, phrase_time_limit=10):
     """Use speech recognition to convert speech to text"""
@@ -518,6 +561,7 @@ def chat_with_ai_stream(user_input):
         full_response = ""
         buffer = ""
         display_cmd = None
+        head_cmd = None
         
         # Send the request and process the stream
         with requests.post(url, headers=headers, json=data, stream=True) as response:
@@ -578,6 +622,17 @@ def chat_with_ai_stream(user_input):
                                             # Generic text display
                                             if display_cmd.startswith("text:"):
                                                 send_to_esp32(display_cmd)
+                                
+                                # Check for head commands as they come in
+                                if "[HEAD:" in buffer and "]" in buffer and not head_cmd:
+                                    start_idx = buffer.find("[HEAD:")
+                                    end_idx = buffer.find("]", start_idx)
+                                    if end_idx > start_idx:
+                                        head_cmd = buffer[start_idx + 6:end_idx].lower()
+                                        
+                                        # Handle the head command
+                                        if head_cmd in ["left", "right", "center", "shake"] or head_cmd.startswith("angle:"):
+                                            send_head_command(head_cmd)
                                 
                                 # Print partial responses for terminal feedback
                                 print(delta_content, end="", flush=True)
